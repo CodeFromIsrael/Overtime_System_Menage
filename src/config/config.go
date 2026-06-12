@@ -29,7 +29,7 @@ func ToLoad() {
 		Door = 9000
 	}
 
-	StringConnectionDb = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_BANK"))
+	StringConnectionDb = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_DATABASE"))
 
 	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 

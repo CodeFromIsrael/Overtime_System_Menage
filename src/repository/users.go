@@ -13,9 +13,9 @@ func NewRepositoryUser(db *sql.DB) *User {
 	return &User{db}
 }
 
-func (u User) Create(user models.Users) (uint64, error) {
+func (u *User) Create(user models.Users) (uint64, error) {
 
-	smt, erro := u.db.Prepare("insert into users (name, display_name, email, password, cpf, phone, role_id) (?,?,?,?,?,?)")
+	smt, erro := u.db.Prepare("insert into users (name, display_name, email, password, cpf, phone, role_id) values (?,?,?,?,?,?,?)")
 
 	if erro != nil {
 		return 0, erro
@@ -36,4 +36,27 @@ func (u User) Create(user models.Users) (uint64, error) {
 		return 0, erro
 	}
 	return uint64(lastidInser), nil
+}
+
+func (u *User) SearchByEmail(email string) (models.Users, error) {
+
+	query, erro := u.db.Query("select id,password from users where email = ? ", email)
+
+	if erro != nil {
+
+		return models.Users{}, erro
+	}
+
+	defer query.Close()
+
+	var user models.Users
+
+	if query.Next() {
+
+		if erro = query.Scan(&user.Id, &user.Password); erro != nil {
+
+			return models.Users{}, erro
+		}
+	}
+	return user, nil
 }

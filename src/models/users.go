@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"overtime_system_menagement/src/segurity"
+	"regexp"
 	"strings"
 )
 
@@ -65,18 +66,28 @@ func (u *Users) displayName() string {
 	return *u.DisplayName
 }
 
-func (User *Users) format(step string) error {
+func (user *Users) format(step string) error {
 
-	User.Name = strings.TrimSpace(User.Name)
+	user.Name = strings.TrimSpace(user.Name)
 
-	//User.Name = clearString(User.Name)
-	//User.Number = clearString(User.Number)
+	user.Cpf = clearString(user.Cpf)
+
+	user.Phone = clearString(user.Phone)
+
 	if step == "cadastro" {
-		passHash, erro := segurity.Hash(User.Password)
+		passHash, erro := segurity.Hash(user.Password)
 		if erro != nil {
 			return erro
 		}
-		User.Password = string(passHash)
+		user.Password = string(passHash)
 	}
 	return nil
+}
+
+func clearString(str string) string {
+	clear := regexp.MustCompile(`[^a-zA-Z0-9]`)
+	newString := clear.ReplaceAllString(str, "")
+	newString = strings.ToLower(newString)
+
+	return newString
 }
