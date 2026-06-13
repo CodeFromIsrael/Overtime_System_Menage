@@ -3,17 +3,18 @@ package service
 import (
 	"fmt"
 	"overtime_system_menagement/src/autentication"
-	"overtime_system_menagement/src/datebase"
 	"overtime_system_menagement/src/models"
 	"overtime_system_menagement/src/repository"
 	"overtime_system_menagement/src/segurity"
 	"strconv"
 )
 
-type UsersServices struct{}
+type UsersServices struct {
+	userRepository *repository.User
+}
 
-func NewUserService() *UsersServices {
-	return &UsersServices{}
+func NewUserService(userRepository *repository.User) *UsersServices {
+	return &UsersServices{userRepository}
 }
 
 func (s *UsersServices) CreateUser(user models.Users) (models.Users, error) {
@@ -23,21 +24,12 @@ func (s *UsersServices) CreateUser(user models.Users) (models.Users, error) {
 		return user, erro
 	}
 
-	db, erro := datebase.Connection()
+	var err error
 
-	if erro != nil {
-		return user, erro
+	user.Id, err = s.userRepository.Create(user)
 
-	}
-
-	defer db.Close()
-
-	repository := repository.NewRepositoryUser(db)
-
-	user.Id, erro = repository.Create(user)
-
-	if erro != nil {
-		return user, erro
+	if err != nil {
+		return user, err
 
 	}
 
@@ -46,17 +38,7 @@ func (s *UsersServices) CreateUser(user models.Users) (models.Users, error) {
 
 func (us *UsersServices) Login(user models.Users) (models.AuthenticationData, error) {
 
-	db, err := datebase.Connection()
-
-	if err != nil {
-		return models.AuthenticationData{}, err
-	}
-
-	defer db.Close()
-
-	repository := repository.NewRepositoryUser(db)
-
-	userInDatabase, err := repository.SearchByEmail(user.Email)
+	userInDatabase, err := us.userRepository.SearchByEmail(user.Email)
 
 	if err != nil {
 		return models.AuthenticationData{}, err

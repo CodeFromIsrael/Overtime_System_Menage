@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"overtime_system_menagement/src/controllers"
 	"overtime_system_menagement/src/milddleweres"
 )
 
@@ -12,9 +13,9 @@ type Route struct {
 	RequiredAutentication bool
 }
 
-func Config(r *http.ServeMux) *http.ServeMux {
+func Config(r *http.ServeMux, uc *controllers.UserController) *http.ServeMux {
 
-	route := routeUsers
+	route := UsersRoutes(uc)
 
 	for _, rota := range route {
 

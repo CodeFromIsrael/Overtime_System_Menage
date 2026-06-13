@@ -8,7 +8,15 @@ import (
 	"overtime_system_menagement/src/service"
 )
 
-func CreateUsers(w http.ResponseWriter, r *http.Request) {
+type UserController struct {
+	userService *service.UsersServices
+}
+
+func NewControlerUser(userSevice *service.UsersServices) *UserController {
+	return &UserController{userSevice}
+}
+
+func (uc *UserController) CreateUsers(w http.ResponseWriter, r *http.Request) {
 
 	bodyrequest, erro := readerOfRequestBody(r)
 
@@ -19,9 +27,12 @@ func CreateUsers(w http.ResponseWriter, r *http.Request) {
 
 	userCreated, erro := ConverterJsonToStruct[models.Users](bodyrequest)
 
-	service := service.NewUserService()
+	if erro != nil {
+		response.Erro(w, http.StatusConflict, erro)
+		return
+	}
 
-	create, erro := service.CreateUser(userCreated)
+	create, erro := uc.userService.CreateUser(userCreated)
 
 	if erro != nil {
 		response.Erro(w, http.StatusInternalServerError, erro)
@@ -32,7 +43,7 @@ func CreateUsers(w http.ResponseWriter, r *http.Request) {
 	response.Json(w, http.StatusCreated, create)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) Login(w http.ResponseWriter, r *http.Request) {
 
 	bodyRequest, err := readerOfRequestBody(r)
 
@@ -52,9 +63,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service := service.NewUserService()
-
-	tokenUser, err := service.Login(user)
+	tokenUser, err := uc.userService.Login(user)
 
 	if err != nil {
 		response.Erro(w, http.StatusInternalServerError, err)

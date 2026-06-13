@@ -5,17 +5,20 @@ import (
 	"overtime_system_menagement/src/controllers"
 )
 
-var routeUsers = []Route{
-	{
-		Uri:                   "/users",
-		Method:                http.MethodPost,
-		Function:              controllers.CreateUsers,
-		RequiredAutentication: false,
-	},
-	{
-		Uri:                   "/login",
-		Method:                http.MethodPost,
-		Function:              controllers.Login,
-		RequiredAutentication: false,
-	},
+func UsersRoutes(uc *controllers.UserController) []Route {
+	return []Route{
+		{
+			Uri:                   "/users",
+			Method:                http.MethodPost,
+			Function:              uc.CreateUsers,
+			RequiredAutentication: false,
+		},
+		{
+			Uri:                   "/login",
+			Method:                http.MethodPost,
+			Function:              uc.Login,
+			RequiredAutentication: false,
+		},
+	}
+
 }
