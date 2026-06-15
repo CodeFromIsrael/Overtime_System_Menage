@@ -1,4 +1,4 @@
-package milddleweres
+package middleweres
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"overtime_system_menagement/src/autentication"
 	"overtime_system_menagement/src/response"
+	"overtime_system_menagement/src/service"
 )
 
 func Logger(nextFunc http.HandlerFunc) http.HandlerFunc {
@@ -43,5 +44,29 @@ func Autentication(nextFunc http.HandlerFunc) http.HandlerFunc {
 		r = r.WithContext(context)
 
 		nextFunc(w, r)
+	}
+}
+
+func AutenticationByAdmin(userService service.UsersServices) func(http.HandlerFunc) http.HandlerFunc {
+
+	return func(nextFunc http.HandlerFunc) http.HandlerFunc {
+
+		return func(w http.ResponseWriter, r *http.Request) {
+
+			userInRequest, err := autentication.ExtractUserId(r)
+
+			if err != nil {
+				response.Erro(w, http.StatusBadRequest, err)
+				return
+			}
+
+			if err = userService.CheckPermissionByAdmin(userInRequest); err != nil {
+				response.Erro(w, http.StatusUnauthorized, err)
+				return
+			}
+
+			nextFunc(w, r)
+		}
+
 	}
 }

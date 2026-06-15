@@ -8,10 +8,11 @@ import (
 func UsersRoutes(uc *controllers.UserController) []Route {
 	return []Route{
 		{
-			Uri:                   "/users",
-			Method:                http.MethodPost,
-			Function:              uc.CreateUsers,
-			RequiredAutentication: false,
+			Uri:                        "/users",
+			Method:                     http.MethodPost,
+			Function:                   uc.CreateUsers,
+			RequiredAutentication:      false,
+			RequiredAdminAutentication: false,
 		},
 		{
 			Uri:                   "/login",

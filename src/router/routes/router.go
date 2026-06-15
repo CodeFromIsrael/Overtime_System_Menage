@@ -3,17 +3,19 @@ package routes
 import (
 	"net/http"
 	"overtime_system_menagement/src/controllers"
-	"overtime_system_menagement/src/milddleweres"
+	"overtime_system_menagement/src/middleweres"
+	"overtime_system_menagement/src/service"
 )
 
 type Route struct {
-	Uri                   string
-	Method                string
-	Function              func(http.ResponseWriter, *http.Request)
-	RequiredAutentication bool
+	Uri                        string
+	Method                     string
+	Function                   func(http.ResponseWriter, *http.Request)
+	RequiredAutentication      bool
+	RequiredAdminAutentication bool
 }
 
-func Config(r *http.ServeMux, uc *controllers.UserController) *http.ServeMux {
+func Config(r *http.ServeMux, uc *controllers.UserController, us service.UsersServices) *http.ServeMux {
 
 	route := UsersRoutes(uc)
 
@@ -21,7 +23,15 @@ func Config(r *http.ServeMux, uc *controllers.UserController) *http.ServeMux {
 
 		handler := rota.Function
 
-		handler = milddleweres.Logger(handler)
+		if rota.RequiredAutentication {
+			handler = middleweres.Autentication(handler)
+		}
+
+		if rota.RequiredAdminAutentication {
+			handler = middleweres.AutenticationByAdmin(us)(handler)
+		}
+
+		handler = middleweres.Logger(handler)
 
 		pattern := rota.Method + " " + rota.Uri
 

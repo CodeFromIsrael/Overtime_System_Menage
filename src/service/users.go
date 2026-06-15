@@ -1,10 +1,12 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"overtime_system_menagement/src/autentication"
 	"overtime_system_menagement/src/models"
 	"overtime_system_menagement/src/repository"
+	"overtime_system_menagement/src/response/responses"
 	"overtime_system_menagement/src/segurity"
 	"strconv"
 )
@@ -17,11 +19,11 @@ func NewUserService(userRepository *repository.User) *UsersServices {
 	return &UsersServices{userRepository}
 }
 
-func (s *UsersServices) CreateUser(user models.Users) (models.Users, error) {
+func (s *UsersServices) CreateUser(user models.Users) (responses.CreateUserResponse, error) {
 
 	if erro := user.Prepare("cadastro"); erro != nil {
 		fmt.Println("não mandei o cadastro ")
-		return user, erro
+		return responses.CreateUserResponse{}, erro
 	}
 
 	var err error
@@ -29,11 +31,18 @@ func (s *UsersServices) CreateUser(user models.Users) (models.Users, error) {
 	user.Id, err = s.userRepository.Create(user)
 
 	if err != nil {
-		return user, err
+		return responses.CreateUserResponse{}, err
 
 	}
 
-	return user, nil
+	var dateUserRetorned responses.CreateUserResponse
+
+	dateUserRetorned.Id = user.Id
+	dateUserRetorned.Name = user.Name
+	dateUserRetorned.Email = user.Email
+	dateUserRetorned.Phone = user.Phone
+
+	return dateUserRetorned, nil
 }
 
 func (us *UsersServices) Login(user models.Users) (models.AuthenticationData, error) {
@@ -59,4 +68,19 @@ func (us *UsersServices) Login(user models.Users) (models.AuthenticationData, er
 
 	return models.AuthenticationData{ID: userId, Token: token}, nil
 
+}
+
+func (us *UsersServices) CheckPermissionByAdmin(userid uint64) error {
+
+	userInRequest, err := us.userRepository.CheckAdmimRole(userid)
+
+	if err != nil {
+		return err
+	}
+
+	if userInRequest.Role.Name != "Super_Administrator" {
+		return errors.New("Usuário sem Permisão")
+	}
+
+	return nil
 }

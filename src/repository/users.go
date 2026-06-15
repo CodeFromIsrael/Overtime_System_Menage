@@ -60,3 +60,77 @@ func (u *User) SearchByEmail(email string) (models.Users, error) {
 	}
 	return user, nil
 }
+
+func (u *User) SearchByAdmin(userid uint64) (models.Users, error) {
+
+	lines, erro := u.db.Query("select id,name,display_name,email,phone,cpf,permissions users where id = ?", userid)
+
+	if erro != nil {
+		return models.Users{}, erro
+	}
+
+	defer lines.Close()
+
+	var user models.Users
+
+	if lines.Next() {
+		if erro = lines.Scan(
+			&user.Id,
+			&user.Name,
+			&user.DisplayName,
+			&user.Email,
+			&user.Phone,
+			&user.Cpf,
+			&user.Permissions,
+		); erro != nil {
+			return models.Users{}, erro
+		}
+
+	}
+
+	return user, nil
+
+}
+
+func (u *User) CheckAdmimRole(userId uint64) (models.UserAndRole, error) {
+
+	query, err := u.db.Query(`select
+
+		us.id,
+		us.name,
+		us.email,
+		us.phone,
+		us.cpf,
+
+
+		rr.id,
+		rr.name
+
+		from users us
+		left join roles rr 
+		on rr.id = us.role_id where us.id = ?
+
+	`, userId)
+
+	if err != nil {
+		return models.UserAndRole{}, err
+	}
+
+	var user models.UserAndRole
+
+	if query.Next() {
+
+		if err = query.Scan(
+			&user.User.Name,
+			&user.User.Email,
+			&user.User.Phone,
+			&user.User.Cpf,
+			&user.Role.Id,
+			&user.Role.Name,
+		); err != nil {
+			return models.UserAndRole{}, err
+		}
+	}
+
+	return user, nil
+}
