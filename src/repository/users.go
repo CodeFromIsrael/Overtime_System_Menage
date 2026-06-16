@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"overtime_system_menagement/src/dto/responses"
 	"overtime_system_menagement/src/models"
 )
 
@@ -92,7 +93,7 @@ func (u *User) SearchByAdmin(userid uint64) (models.Users, error) {
 
 }
 
-func (u *User) CheckAdmimRole(userId uint64) (models.UserAndRole, error) {
+func (u *User) CheckAdmimRole(userId uint64) (responses.UserAndRole, error) {
 
 	query, err := u.db.Query(`select
 
@@ -113,14 +114,15 @@ func (u *User) CheckAdmimRole(userId uint64) (models.UserAndRole, error) {
 	`, userId)
 
 	if err != nil {
-		return models.UserAndRole{}, err
+		return responses.UserAndRole{}, err
 	}
 
-	var user models.UserAndRole
+	var user responses.UserAndRole
 
 	if query.Next() {
 
 		if err = query.Scan(
+			&user.User.Id,
 			&user.User.Name,
 			&user.User.Email,
 			&user.User.Phone,
@@ -128,7 +130,7 @@ func (u *User) CheckAdmimRole(userId uint64) (models.UserAndRole, error) {
 			&user.Role.Id,
 			&user.Role.Name,
 		); err != nil {
-			return models.UserAndRole{}, err
+			return responses.UserAndRole{}, err
 		}
 	}
 

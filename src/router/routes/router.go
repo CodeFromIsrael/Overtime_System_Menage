@@ -15,20 +15,22 @@ type Route struct {
 	RequiredAdminAutentication bool
 }
 
-func Config(r *http.ServeMux, uc *controllers.UserController, us service.UsersServices) *http.ServeMux {
+func Config(r *http.ServeMux, uc *controllers.UserController, us service.UsersServices, cc *controllers.CompanyController) *http.ServeMux {
 
 	route := UsersRoutes(uc)
+
+	route = append(route, CompanyRoutes(cc)...)
 
 	for _, rota := range route {
 
 		handler := rota.Function
 
-		if rota.RequiredAutentication {
-			handler = middleweres.Autentication(handler)
-		}
-
 		if rota.RequiredAdminAutentication {
 			handler = middleweres.AutenticationByAdmin(us)(handler)
+		}
+
+		if rota.RequiredAutentication {
+			handler = middleweres.Autentication(handler)
 		}
 
 		handler = middleweres.Logger(handler)

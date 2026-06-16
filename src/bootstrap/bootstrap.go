@@ -17,7 +17,13 @@ func Initialize(Dd *sql.DB) *http.ServeMux {
 
 	userController := controllers.NewControlerUser(userService)
 
-	r := router.Generete(userController, *userService)
+	companyRepository := repository.NewRepositoryCompany(Dd)
+
+	companyService := service.NewCompanyService(companyRepository)
+
+	companyController := controllers.NewControlerCompany(companyService)
+
+	r := router.Generete(userController, *userService, companyController)
 
 	return r
 }
