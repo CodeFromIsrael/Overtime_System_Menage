@@ -7,8 +7,8 @@ import (
 	"overtime_system_menagement/src/service"
 )
 
-func Generete(uc *controllers.UserController, us service.UsersServices, cc *controllers.CompanyController) *http.ServeMux {
+func Generete(uc *controllers.UserController, us service.UsersServices, cc *controllers.CompanyController, c *controllers.ContractController) *http.ServeMux {
 	r := http.NewServeMux()
 
-	return routes.Config(r, uc, us, cc)
+	return routes.Config(r, uc, us, cc, c)
 }

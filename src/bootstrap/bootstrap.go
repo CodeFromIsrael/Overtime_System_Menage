@@ -23,7 +23,13 @@ func Initialize(Dd *sql.DB) *http.ServeMux {
 
 	companyController := controllers.NewControlerCompany(companyService)
 
-	r := router.Generete(userController, *userService, companyController)
+	contractRepository := repository.NewRepositoryContract(Dd)
+
+	contractService := service.NewContractService(contractRepository)
+
+	contractController := controllers.NewControlerContract(contractService)
+
+	r := router.Generete(userController, *userService, companyController, contractController)
 
 	return r
 }

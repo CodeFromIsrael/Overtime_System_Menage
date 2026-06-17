@@ -15,11 +15,13 @@ type Route struct {
 	RequiredAdminAutentication bool
 }
 
-func Config(r *http.ServeMux, uc *controllers.UserController, us service.UsersServices, cc *controllers.CompanyController) *http.ServeMux {
+func Config(r *http.ServeMux, uc *controllers.UserController, us service.UsersServices, cc *controllers.CompanyController, c *controllers.ContractController) *http.ServeMux {
 
 	route := UsersRoutes(uc)
 
 	route = append(route, CompanyRoutes(cc)...)
+
+	route = append(route, ContractRoutes(c)...)
 
 	for _, rota := range route {
 

@@ -25,7 +25,7 @@ func Autentication(nextFunc http.HandlerFunc) http.HandlerFunc {
 
 		if erro := autentication.ValidadeToken(r); erro != nil {
 
-			fmt.Println("não valida o tokan")
+			fmt.Println("não valida o token")
 
 			response.Erro(w, http.StatusUnauthorized, erro)
 

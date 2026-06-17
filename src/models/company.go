@@ -50,5 +50,7 @@ func (c *Company) format() error {
 
 	c.TaxIndefier = clearString(c.TaxIndefier)
 
+	c.State = clearString(c.State)
+
 	return nil
 }
