@@ -2,9 +2,8 @@ package routes
 
 import (
 	"net/http"
-	"overtime_system_menagement/src/controllers"
+	"overtime_system_menagement/src/container"
 	"overtime_system_menagement/src/middleweres"
-	"overtime_system_menagement/src/service"
 )
 
 type Route struct {
@@ -15,20 +14,22 @@ type Route struct {
 	RequiredAdminAutentication bool
 }
 
-func Config(r *http.ServeMux, uc *controllers.UserController, us service.UsersServices, cc *controllers.CompanyController, c *controllers.ContractController) *http.ServeMux {
+func Config(r *http.ServeMux, deps container.Dependences) *http.ServeMux {
 
-	route := UsersRoutes(uc)
+	route := UsersRoutes(deps.UserController)
 
-	route = append(route, CompanyRoutes(cc)...)
+	route = append(route, CompanyRoutes(deps.CompanyController)...)
 
-	route = append(route, ContractRoutes(c)...)
+	route = append(route, ContractRoutes(deps.ContractController)...)
+
+	route = append(route, allocationsRoutes(deps.AllocationController)...)
 
 	for _, rota := range route {
 
 		handler := rota.Function
 
 		if rota.RequiredAdminAutentication {
-			handler = middleweres.AutenticationByAdmin(us)(handler)
+			handler = middleweres.AutenticationByAdmin(*deps.UserService)(handler)
 		}
 
 		if rota.RequiredAutentication {

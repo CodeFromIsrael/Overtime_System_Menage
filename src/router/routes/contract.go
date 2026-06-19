@@ -8,7 +8,7 @@ import (
 func ContractRoutes(cc *controllers.ContractController) []Route {
 	return []Route{
 		{
-			Uri:                        "/contract/service",
+			Uri:                        "/contract/employee",
 			Method:                     http.MethodPost,
 			Function:                   cc.CreateContractEmployee,
 			RequiredAutentication:      true,
