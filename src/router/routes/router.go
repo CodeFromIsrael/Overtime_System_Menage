@@ -24,6 +24,8 @@ func Config(r *http.ServeMux, deps container.Dependences) *http.ServeMux {
 
 	route = append(route, allocationsRoutes(deps.AllocationController)...)
 
+	route = append(route, routesOvertimeRecord(deps.OvertimeRecord)...)
+
 	for _, rota := range route {
 
 		handler := rota.Function

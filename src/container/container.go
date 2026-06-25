@@ -11,4 +11,5 @@ type Dependences struct {
 	CompanyController    *controllers.CompanyController
 	ContractController   *controllers.ContractController
 	AllocationController *controllers.Allocations
+	OvertimeRecord       *controllers.OvertimeRecordController
 }

@@ -17,12 +17,15 @@ func Initialize(Dd *sql.DB) *http.ServeMux {
 
 	allocationControllers := buildAllocationModule(Dd)
 
+	overtimeControllers := buildOvertimeModule(Dd)
+
 	deps := container.Dependences{
 		UserController:       userController,
 		UserService:          userService,
 		ContractController:   contractController,
 		CompanyController:    companyController,
 		AllocationController: allocationControllers,
+		OvertimeRecord:       overtimeControllers,
 	}
 
 	r := router.Generete(deps)
