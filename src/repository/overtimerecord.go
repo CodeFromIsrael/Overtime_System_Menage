@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"overtime_system_menagement/src/dto/responses"
 	"overtime_system_menagement/src/models"
 	"time"
 )
@@ -60,4 +61,66 @@ func (o *OvertimeRecord) CheckIfHoliday(date time.Time) (models.Holiday, error) 
 	}
 
 	return holiday, nil
+}
+
+func (o *OvertimeRecord) ReturnOvertimeEmployee(name string) ([]responses.OvertimeEmployee, error) {
+
+	query, err := o.db.Query(`
+	  select 
+
+	o.id AS overtime_records_id,
+    o.work_date As overtime_records_work_date,
+    o.start_time AS overtime_records_start_time,
+    o.end_time AS overtime_records_end_time,
+    o.overtime_type_id AS overtime_records_type_overtime_id,
+    o.total_hours AS overtime_records_total_hours,
+    o.night_hours AS overtime_night_hours,
+    
+    u.id AS users_id,
+    u.name AS users_name
+    
+    from overtime_records o
+    inner join allocations al
+    
+    on o.allocation_id = al.id 
+    inner join contracts_employee ce
+    
+    on al.employee_contract_id = ce.id
+    
+    inner join users u
+    on ce.user_id = u.id 
+    
+    where u.name = ? order by o.work_date desc;
+	`, name)
+
+	if err != nil {
+		return []responses.OvertimeEmployee{}, err
+	}
+
+	defer query.Close()
+
+	var overtimeEmployee []responses.OvertimeEmployee
+
+	for query.Next() {
+
+		var oE responses.OvertimeEmployee
+
+		if err = query.Scan(
+			&oE.Overtime.Id,
+			&oE.Overtime.WorkDate,
+			&oE.TypeStartTimeReturned,
+			&oE.TypeEndtimeReturned,
+			&oE.Overtime.OvertimeTypesId,
+			&oE.Overtime.TotalHours,
+			&oE.Overtime.NigthHours,
+			&oE.Employee.Id,
+			&oE.Employee.Name,
+		); err != nil {
+			return []responses.OvertimeEmployee{}, err
+		}
+
+		overtimeEmployee = append(overtimeEmployee, oE)
+	}
+
+	return overtimeEmployee, nil
 }

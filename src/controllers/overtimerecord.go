@@ -39,3 +39,23 @@ func (o *OvertimeRecordController) CreateOvertimeRecord(w http.ResponseWriter, r
 
 	response.Json(w, http.StatusCreated, overtimeCreated)
 }
+
+func (o *OvertimeRecordController) ReturnOvertimeEmployee(w http.ResponseWriter, r *http.Request) {
+
+	nameEmployee, err := readParameter(r, "name")
+
+	if err != nil {
+
+		response.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	overtimeEmployee, err := o.serviceOvertimeRecord.ReturnOvertimeEmployee(nameEmployee)
+
+	if err != nil {
+		response.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.Json(w, http.StatusOK, overtimeEmployee)
+}

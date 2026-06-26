@@ -14,5 +14,13 @@ func routesOvertimeRecord(co *controllers.OvertimeRecordController) []Route {
 			Function:              co.CreateOvertimeRecord,
 			RequiredAutentication: true,
 		},
+
+		{
+			Uri:                        "/overtime",
+			Method:                     http.MethodGet,
+			Function:                   co.ReturnOvertimeEmployee,
+			RequiredAutentication:      true,
+			RequiredAdminAutentication: true,
+		},
 	}
 }

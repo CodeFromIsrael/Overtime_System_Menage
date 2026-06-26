@@ -1,8 +1,10 @@
 package service
 
 import (
+	"overtime_system_menagement/src/dto/responses"
 	"overtime_system_menagement/src/models"
 	"overtime_system_menagement/src/repository"
+	"strings"
 	"time"
 )
 
@@ -60,12 +62,21 @@ func (o *OvertimeRecordService) checkTypeOvertime(date time.Time) (uint64, error
 		return 0, err
 	}
 
-	if date.Weekday() == time.Monday || date.Equal(holiday.Date) {
-		typeId = 1
+	if date.Weekday() == time.Sunday {
+		typeId = 2
 		return typeId, nil
 	}
 
-	typeId = 2
+	y1, m1, d1 := date.Date()
+
+	y2, m2, d2 := holiday.Date.Date()
+
+	if y1 == y2 && m1 == m2 && d1 == d2 {
+		return 2, nil
+	}
+
+	typeId = 1
+
 	return typeId, nil
 }
 
@@ -109,4 +120,17 @@ func (o *OvertimeRecordService) calculeteNigthHours(startTime, endTime time.Time
 	}
 
 	return 0, nil
+}
+
+func (o *OvertimeRecordService) ReturnOvertimeEmployee(nameEmployee string) ([]responses.OvertimeEmployee, error) {
+
+	nameEmployee = strings.ToLower(nameEmployee)
+
+	overtimeEmployee, err := o.repository.ReturnOvertimeEmployee(nameEmployee)
+
+	if err != nil {
+		return []responses.OvertimeEmployee{}, err
+	}
+
+	return overtimeEmployee, nil
 }
