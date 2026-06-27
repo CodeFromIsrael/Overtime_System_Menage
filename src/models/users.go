@@ -35,7 +35,9 @@ func (u *Users) validate() error {
 		return errors.New("campo nome e obrigatório")
 	}
 
-	u.displayName()
+	if u.DisplayName == nil {
+		u.DisplayName = &u.Name
+	}
 
 	if u.Email == "" {
 		return errors.New("campo email vazio")
@@ -57,7 +59,7 @@ func (u *Users) validate() error {
 
 }
 
-func (u *Users) displayName() string {
+func (u *Users) ReaderDisplayName(name *string) string {
 
 	if u.DisplayName == nil {
 		return ""

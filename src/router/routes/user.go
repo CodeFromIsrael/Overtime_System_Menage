@@ -14,11 +14,19 @@ func UsersRoutes(uc *controllers.UserController) []Route {
 			RequiredAutentication:      false,
 			RequiredAdminAutentication: false,
 		},
+
 		{
 			Uri:                   "/login",
 			Method:                http.MethodPost,
 			Function:              uc.Login,
 			RequiredAutentication: false,
+		},
+
+		{
+			Uri:                   "/users",
+			Method:                http.MethodGet,
+			Function:              uc.ReturnUserData,
+			RequiredAutentication: true,
 		},
 	}
 

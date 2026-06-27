@@ -136,3 +136,30 @@ func (u *User) CheckAdmimRole(userId uint64) (responses.UserAndRole, error) {
 
 	return user, nil
 }
+
+func (u *User) ReturnUserById(id uint64) (models.Users, error) {
+
+	query, err := u.db.Query("select name,display_name,email,phone from users where id = ?", id)
+
+	if err != nil {
+		return models.Users{}, err
+	}
+
+	defer query.Close()
+
+	var user models.Users
+
+	if query.Next() {
+
+		if err = query.Scan(
+			&user.Name,
+			&user.DisplayName,
+			&user.Email,
+			&user.Phone,
+		); err != nil {
+			return models.Users{}, err
+		}
+	}
+
+	return user, nil
+}

@@ -7,11 +7,12 @@ import (
 )
 
 type Route struct {
-	Uri                        string
-	Method                     string
-	Function                   func(http.ResponseWriter, *http.Request)
-	RequiredAutentication      bool
-	RequiredAdminAutentication bool
+	Uri                            string
+	Method                         string
+	Function                       func(http.ResponseWriter, *http.Request)
+	RequiredAutentication          bool
+	RequiredAdminAutentication     bool
+	RequiredCheckPermissionRecurse bool
 }
 
 func Config(r *http.ServeMux, deps container.Dependences) *http.ServeMux {
@@ -29,6 +30,10 @@ func Config(r *http.ServeMux, deps container.Dependences) *http.ServeMux {
 	for _, rota := range route {
 
 		handler := rota.Function
+
+		if rota.RequiredCheckPermissionRecurse {
+			handler = middleweres.AuthenticationBossResource(*deps.UserService, *deps.OvertimeService)(handler)
+		}
 
 		if rota.RequiredAdminAutentication {
 			handler = middleweres.AutenticationByAdmin(*deps.UserService)(handler)

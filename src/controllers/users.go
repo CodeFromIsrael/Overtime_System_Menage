@@ -72,3 +72,18 @@ func (uc *UserController) Login(w http.ResponseWriter, r *http.Request) {
 
 	response.Json(w, http.StatusOK, tokenUser)
 }
+
+func (uc *UserController) ReturnUserData(w http.ResponseWriter, r *http.Request) {
+
+	userInRequest := retriveUserInToken(r)
+
+	user, err := uc.userService.ReturnUserData(userInRequest)
+
+	if err != nil {
+		response.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.Json(w, http.StatusOK, user)
+
+}

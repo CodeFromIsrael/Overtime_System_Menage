@@ -84,3 +84,18 @@ func (us *UsersServices) CheckPermissionByAdmin(userid uint64) error {
 
 	return nil
 }
+
+func (us *UsersServices) ReturnUserData(id uint64) (models.Users, error) {
+
+	if id == 0 {
+		return models.Users{}, errors.New("id inválido")
+	}
+
+	user, err := us.userRepository.ReturnUserById(id)
+
+	if err != nil {
+		return models.Users{}, err
+	}
+
+	return user, nil
+}

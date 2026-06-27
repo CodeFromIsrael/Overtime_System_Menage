@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"overtime_system_menagement/src/dto/responses"
 	"overtime_system_menagement/src/models"
 	"overtime_system_menagement/src/repository"
@@ -133,4 +134,19 @@ func (o *OvertimeRecordService) ReturnOvertimeEmployee(nameEmployee string) ([]r
 	}
 
 	return overtimeEmployee, nil
+}
+
+func (o *OvertimeRecordService) ReturnOvertimebyId(idOvertime uint64) (responses.OvertimeEmployee, error) {
+
+	if idOvertime == 0 {
+		return responses.OvertimeEmployee{}, errors.New("id inválido")
+	}
+
+	overtimereimbursed, err := o.repository.ReturnOvertimeById(idOvertime)
+
+	if err != nil {
+		return responses.OvertimeEmployee{}, err
+	}
+
+	return overtimereimbursed, nil
 }

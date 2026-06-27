@@ -7,7 +7,7 @@ import (
 	"overtime_system_menagement/src/service"
 )
 
-func buildOvertimeModule(db *sql.DB) *controllers.OvertimeRecordController {
+func buildOvertimeModule(db *sql.DB) (*controllers.OvertimeRecordController, *service.OvertimeRecordService) {
 
 	overtimeRepository := repository.NewRepositoryOvertimeRecord(db)
 
@@ -15,5 +15,5 @@ func buildOvertimeModule(db *sql.DB) *controllers.OvertimeRecordController {
 
 	overtimeController := controllers.NewControllerOvertimeRecord(overtimeService)
 
-	return overtimeController
+	return overtimeController, overtimeService
 }
