@@ -17,6 +17,8 @@ func NewControllerOvertimeRecord(serviceOvertime *service.OvertimeRecordService)
 
 func (o *OvertimeRecordController) CreateOvertimeRecord(w http.ResponseWriter, r *http.Request) {
 
+	userInRequest := retriveUserInToken(r)
+
 	bodyRequest, err := readerOfRequestBody(r)
 
 	if err != nil {
@@ -31,7 +33,7 @@ func (o *OvertimeRecordController) CreateOvertimeRecord(w http.ResponseWriter, r
 		return
 	}
 
-	overtimeCreated, err := o.serviceOvertimeRecord.CreateOvertimeRecord(dataOvertime)
+	overtimeCreated, err := o.serviceOvertimeRecord.CreateOvertimeRecord(dataOvertime, userInRequest)
 
 	if err != nil {
 		response.Erro(w, http.StatusInternalServerError, err)

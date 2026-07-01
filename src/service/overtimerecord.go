@@ -14,10 +14,11 @@ type OvertimeRecordService struct {
 }
 
 func NewServiceOvertimeRecord(repositoryOvertime *repository.OvertimeRecord) *OvertimeRecordService {
+
 	return &OvertimeRecordService{repositoryOvertime}
 }
 
-func (o *OvertimeRecordService) CreateOvertimeRecord(ovt models.OvertimeRecord) (models.OvertimeRecord, error) {
+func (o *OvertimeRecordService) CreateOvertimeRecord(ovt models.OvertimeRecord, idUserInRequest uint64) (models.OvertimeRecord, error) {
 
 	if err := ovt.Prepare(); err != nil {
 		return models.OvertimeRecord{}, err
@@ -42,6 +43,18 @@ func (o *OvertimeRecordService) CreateOvertimeRecord(ovt models.OvertimeRecord) 
 	if err != nil {
 		return models.OvertimeRecord{}, err
 	}
+
+	idAllocationEmployee, err := o.repository.ReturnAllocationEmployeeId(idUserInRequest)
+
+	if err != nil {
+		return models.OvertimeRecord{}, err
+	}
+
+	if idAllocationEmployee == 0 {
+		return models.OvertimeRecord{}, errors.New("Allocação nula")
+	}
+
+	ovt.AllocationId = idAllocationEmployee
 
 	ovt.Id, err = o.repository.CreateOvertimeRecord(ovt)
 

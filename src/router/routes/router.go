@@ -31,6 +31,8 @@ func Config(r *http.ServeMux, deps container.Dependences) *http.ServeMux {
 
 		handler := rota.Function
 
+		handler = middleweres.HandlingCors(handler)
+
 		if rota.RequiredCheckPermissionRecurse {
 			handler = middleweres.AuthenticationBossResource(*deps.UserService, *deps.OvertimeService)(handler)
 		}

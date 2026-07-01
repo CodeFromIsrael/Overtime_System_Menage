@@ -125,7 +125,7 @@ func (o *OvertimeRecord) ReturnOvertimeEmployee(name string) ([]responses.Overti
 	return overtimeEmployee, nil
 }
 
-func (o *OvertimeRecord) ReturnOvertimeById(id uint64) (responses.OvertimeEmployee, error) {
+func (o *OvertimeRecord) ReturnOvertimeById(idOvertime uint64) (responses.OvertimeEmployee, error) {
 
 	query, err := o.db.Query(`
 	  select 
@@ -153,7 +153,7 @@ func (o *OvertimeRecord) ReturnOvertimeById(id uint64) (responses.OvertimeEmploy
     on ce.user_id = u.id 
     
     where o.id = ? 
-	`, id)
+	`, idOvertime)
 
 	if err != nil {
 		return responses.OvertimeEmployee{}, err
@@ -182,4 +182,102 @@ func (o *OvertimeRecord) ReturnOvertimeById(id uint64) (responses.OvertimeEmploy
 	}
 
 	return overtimeEmployee, nil
+}
+
+func (o *OvertimeRecord) ReturnOvertimeEmployeeById(idUser uint64) ([]responses.OvertimeEmployee, error) {
+
+	query, err := o.db.Query(` select 
+
+	o.id AS overtime_records_id,
+    o.work_date As overtime_records_work_date,
+    o.start_time AS overtime_records_start_time,
+    o.end_time AS overtime_records_end_time,
+    o.overtime_type_id AS overtime_records_type_overtime_id,
+    o.total_hours AS overtime_records_total_hours,
+    o.night_hours AS overtime_night_hours,
+    
+    u.id AS users_id,
+    u.name AS users_name
+    
+    from overtime_records o
+    inner join allocations al
+    
+    on o.allocation_id = al.id 
+    inner join contracts_employee ce
+    
+    on al.employee_contract_id = ce.id
+    
+    inner join users u
+    on ce.user_id = u.id 
+    
+    where u.id = ? 
+	`, idUser)
+
+	if err != nil {
+		return []responses.OvertimeEmployee{}, err
+	}
+
+	defer query.Close()
+
+	var overtimeUser []responses.OvertimeEmployee
+
+	for query.Next() {
+
+		var ovtUser responses.OvertimeEmployee
+
+		if err = query.Scan(
+			&ovtUser.Overtime.Id,
+			&ovtUser.Overtime.WorkDate,
+			&ovtUser.TypeStartTimeReturned,
+			&ovtUser.TypeEndtimeReturned,
+			&ovtUser.Overtime.OvertimeTypesId,
+			&ovtUser.Overtime.TotalHours,
+			&ovtUser.Overtime.NigthHours,
+			&ovtUser.Employee.Id,
+			&ovtUser.Employee.Name,
+		); err != nil {
+			return []responses.OvertimeEmployee{}, err
+		}
+
+		overtimeUser = append(overtimeUser, ovtUser)
+	}
+
+	return overtimeUser, nil
+}
+
+func (o *OvertimeRecord) ReturnAllocationEmployeeId(idEmployee uint64) (uint64, error) {
+
+	var idAllocationUser uint64
+
+	query, err := o.db.Query(`
+		SELECT
+        a.id AS allocations_id
+    
+      FROM allocations a
+
+    INNER JOIN contracts_employee ce
+
+    ON a.employee_contract_id = ce.id
+
+    WHERE ce.user_id = ?
+
+	`, idEmployee)
+
+	if err != nil {
+
+		return 0, err
+	}
+
+	defer query.Close()
+
+	if query.Next() {
+
+		if err = query.Scan(
+			&idAllocationUser,
+		); err != nil {
+			return 0, err
+		}
+	}
+
+	return idAllocationUser, err
 }
